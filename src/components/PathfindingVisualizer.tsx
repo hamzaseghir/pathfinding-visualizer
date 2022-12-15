@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './node.css';
+import styled from 'styled-components';
 
 const useMatrix = () => {
   const [matrix, setMatrix] = useState<Array<Array<number>>>([[]]);
@@ -22,7 +23,7 @@ const useMatrix = () => {
         const n = [];
         arr.map((node, nodeIndex) => {
           if (arrayIndex == yNode && nodeIndex == xNode) {
-            n.push(node + 1);
+            n.push((node + 1) % 3);
           } else {
             n.push(node);
           }
@@ -39,7 +40,7 @@ const useMatrix = () => {
 
   const MatrixNodeStyle = {
     0: {
-      ['--background-color']: '#FFFF',
+      ['--background-color']: '#FFF2',
     },
     1: {
       ['--background-color']: '#ff0202',
@@ -50,7 +51,8 @@ const useMatrix = () => {
   };
 
   const matrixNode = (value: number, x: number, y: number) => {
-    const nodeStyle = MatrixNodeStyle[value as keyof typeof MatrixNodeStyle];
+    const nodeStyle = MatrixNodeStyle[value as keyof typeof MatrixNodeStyle]["--background-color"];
+    console.log(nodeStyle)
     return (
       <p
         className="node"
@@ -58,6 +60,7 @@ const useMatrix = () => {
         data-x={x}
         key={y + ' ' + x}
         onClick={handleClick}
+        style={{  }}
       >
         {value}
       </p>
