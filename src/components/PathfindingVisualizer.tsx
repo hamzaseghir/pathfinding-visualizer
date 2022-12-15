@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './node.css';
+import { MatrixWrapper } from './PathfindingVisualizer.style';
 import styled from 'styled-components';
 
 const useMatrix = () => {
@@ -38,21 +38,11 @@ const useMatrix = () => {
     }); */
   };
 
-  const MatrixNodeStyle = {
-    0: {
-      ['--background-color']: '#FFF2',
-    },
-    1: {
-      ['--background-color']: '#ff0202',
-    },
-    2: {
-      ['--background-color']: '#02ff05',
-    },
-  };
+  const nodeStyleList = ['#FFFF', '#FFF2', '#02ff05', '#ff0202'];
 
   const matrixNode = (value: number, x: number, y: number) => {
-    const nodeStyle = MatrixNodeStyle[value as keyof typeof MatrixNodeStyle]["--background-color"];
-    console.log(nodeStyle)
+    const nodeStyle = nodeStyleList[value];
+    console.log(nodeStyle);
     return (
       <p
         className="node"
@@ -60,7 +50,7 @@ const useMatrix = () => {
         data-x={x}
         key={y + ' ' + x}
         onClick={handleClick}
-        style={{  }}
+        style={{ backgroundColor: nodeStyle }}
       >
         {value}
       </p>
@@ -75,7 +65,7 @@ const useMatrix = () => {
       }
     }
 
-    return <div className="matrixWrapper">{arr}</div>;
+    return <MatrixWrapper>{arr}</MatrixWrapper>;
   };
 
   return { Matrix, generateMatrix, matrix };
