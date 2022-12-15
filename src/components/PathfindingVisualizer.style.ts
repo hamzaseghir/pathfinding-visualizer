@@ -32,7 +32,6 @@ export const Node = styled.p<Props>`
     height: 100%;
     border: 2px solid;
     border-color: red;
-    background:purple;
     color: black;
     text-align: center;
 }`;

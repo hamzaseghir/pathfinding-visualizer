@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 const useMatrix = () => {
   const [matrix, setMatrix] = useState<Array<Array<number>>>([[]]);
+  const [start, setStart] = useState(false);
+  const [end, setEnd] = useState(false);
 
   const generateMatrix = () => {
     const arr = Array(2).fill(Array(2).fill(0));
@@ -14,8 +16,7 @@ const useMatrix = () => {
     setMatrix(generateMatrix());
   }, []);
 
-  const handleClick = (event) => {
-    event.currentTarget.style.backgroundColor = 'salmon';
+  const handleNodeClick = (event) => {
     const xNode = event.currentTarget.dataset.x;
     const yNode = event.currentTarget.dataset.y;
     setMatrix(
@@ -23,7 +24,15 @@ const useMatrix = () => {
         const n = [];
         arr.map((node, nodeIndex) => {
           if (arrayIndex == yNode && nodeIndex == xNode) {
-            n.push((node + 1) % 3);
+            if (start) {
+              n.push(3);
+              handleStartFlag();
+            } else if (end) {
+              n.push(4);
+              handleEndFlag();
+            } else {
+              n.push(node > 2 ? 0 : (node + 1) % 3);
+            }
           } else {
             n.push(node);
           }
@@ -31,25 +40,35 @@ const useMatrix = () => {
         return n;
       })
     );
-    /* setMatrix((prevState) => {
-      const m = [...prevState];
-      m[yNode][xNode] += 1;
-      return [...m];
-    }); */
   };
 
-  const nodeStyleList = ['#FFFF', '#FFF2', '#02ff05', '#ff0202'];
+  const handleStartFlag = () => {
+    setStart(!start);
+  };
+
+  const handleEndFlag = () => {
+    setEnd(!end);
+  };
+
+  const StartButton = () => {
+    return <button onClick={handleStartFlag}>Start node</button>;
+  };
+
+  const EndButton = () => {
+    return <button onClick={handleEndFlag}>End node</button>;
+  };
+
+  const nodeStyleList = ['#FFFF', '#FFF2', '#02ff05', '#ff0202', '#0226ff'];
 
   const matrixNode = (value: number, x: number, y: number) => {
     const nodeStyle = nodeStyleList[value];
-    console.log(nodeStyle);
     return (
       <p
         className="node"
         data-y={y}
         data-x={x}
         key={y + ' ' + x}
-        onClick={handleClick}
+        onClick={handleNodeClick}
         style={{ backgroundColor: nodeStyle }}
       >
         {value}
@@ -68,15 +87,18 @@ const useMatrix = () => {
     return <MatrixWrapper>{arr}</MatrixWrapper>;
   };
 
-  return { Matrix, generateMatrix, matrix };
+  return { Matrix, generateMatrix, matrix, StartButton, EndButton };
 };
 
 const PathfindingVisualizer = () => {
-  const { Matrix, generateMatrix, matrix } = useMatrix();
+  const { Matrix, generateMatrix, matrix, StartButton, EndButton } =
+    useMatrix();
 
   return (
     <>
       <h1>Pathfindig Visualizer 🚀</h1>
+      <StartButton />
+      <EndButton />
       <Matrix {...matrix} />
     </>
   );
