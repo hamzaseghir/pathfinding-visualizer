@@ -30,11 +30,15 @@ const useMatrix = () => {
 
 
   useEffect(() => {
-    if(startNode[0] != -1 && prevStartNode[0] != -1)cleanUpNode(prevStartNode[0],prevStartNode[1]);
+    if(startNode[0] != -1 && prevStartNode[0] != -1 
+      && JSON.stringify(prevStartNode) != JSON.stringify(startNode) 
+      && JSON.stringify(prevStartNode) != JSON.stringify(endNode) )cleanUpNode(prevStartNode[0],prevStartNode[1]);
   },[startNode])
 
   useEffect(() => {
-    if(endNode[0] != -1 && prevEndNode[0] != -1)cleanUpNode(prevEndNode[0],prevEndNode[1]);
+    if(endNode[0] != -1 && prevEndNode[0] != -1 
+      && JSON.stringify(prevEndNode) != JSON.stringify(endNode)
+      && JSON.stringify(prevEndNode) != JSON.stringify(endNode) )cleanUpNode(prevEndNode[0],prevEndNode[1]);
   },[endNode])
 
   const cleanUpMatrix = () => {
