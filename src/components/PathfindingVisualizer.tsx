@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { MatrixWrapper } from './PathfindingVisualizer.style';
+import { BaseSyntheticEvent, useEffect, useState } from 'react';
+import { MatrixWrapper , StateButton} from './PathfindingVisualizer.style';
 import styled from 'styled-components';
 import water from '../img/water.png';
 import dirt from '../img/dirt.png'
@@ -9,8 +9,12 @@ import flag from '../img/flag.webp'
 
 const useMatrix = () => {
   const [matrix, setMatrix] = useState<Array<Array<number>>>([[]]);
-  const [start, setStart] = useState(false);
-  const [end, setEnd] = useState(false);
+  const [startFlag, setStartFlag] = useState({state:false});
+  const [startNode, setStartNode] = useState([-1,-1])
+  const [prevStartNode, setPrevStartNode] = useState([-1,-1]);
+  const [endFlag, setEndFlag] = useState({state:false});
+  const [endNode, setEndNode] = useState([-1,-1]);
+  const [prevEndNode, setPrevEndNode] = useState([-1,-1]);
   const [pressed, setPressed] = useState(false);
   const [triggered, setTriggered] = useState(false);
 
@@ -24,19 +28,56 @@ const useMatrix = () => {
     setMatrix(generateMatrix());
   }, []);
 
-  const handleNodeClick = (event) => {
-    const xNode = event.currentTarget.dataset.x;
-    const yNode = event.currentTarget.dataset.y;
+
+  useEffect(() => {
+    if(startNode[0] != -1 && prevStartNode[0] != -1)cleanUpNode(prevStartNode[0],prevStartNode[1]);
+  },[startNode])
+
+  useEffect(() => {
+    if(endNode[0] != -1 && prevEndNode[0] != -1)cleanUpNode(prevEndNode[0],prevEndNode[1]);
+  },[endNode])
+
+  const cleanUpMatrix = () => {
+    setMatrix(matrix.map(arr => {
+      const n:number[] = [];
+      arr.map(node => {
+        n.push(0)
+      })
+      return n;
+    }))
+  }
+
+  const cleanUpNode = (y:number,x:number) => {
     setMatrix(
       matrix.map((arr, arrayIndex) => {
-        const n = [];
+        const n:number[] = [];
         arr.map((node, nodeIndex) => {
-          if (arrayIndex == yNode && nodeIndex == xNode) {
-            if (start) {
+          if (arrayIndex == y && nodeIndex == x) {
+            n.push(0);
+        }else{
+          n.push(node);
+        }
+      })
+      return n;
+  }))
+}
+
+  const updateMatrix =(y:number,x:number) =>{
+    const prev = startNode;
+    setMatrix(
+      matrix.map((arr, arrayIndex) => {
+        const n:number[] = [];
+        arr.map((node, nodeIndex) => {
+          if (arrayIndex == y && nodeIndex == x) {
+            if (startFlag.state) {
               n.push(3);
+              setPrevStartNode([startNode[0],startNode[1]])
+              setStartNode([y,x]);
               handleStartFlag();
-            } else if (end) {
+            } else if (endFlag.state) {
               n.push(4);
+              setPrevEndNode([endNode[0],endNode[1]])
+              setEndNode([y,x]);
               handleEndFlag();
             } else {
               n.push(node > 2 ? 0 : (node + 1) % 3);
@@ -48,16 +89,22 @@ const useMatrix = () => {
         return n;
       })
     );
+  }
+
+  const handleNodeClick = (event:BaseSyntheticEvent) => {
+    const xNode = event.currentTarget.dataset.x;
+    const yNode = event.currentTarget.dataset.y;
+    updateMatrix(yNode,xNode);
   };
 
-  const handleNodeHover = (event) => {
+  const handleNodeHover = (event:BaseSyntheticEvent) => {
     if(!triggered){
       setTriggered(true);
       const xNode = event.currentTarget.dataset.x;
       const yNode = event.currentTarget.dataset.y;
       setMatrix(
         matrix.map((arr, arrayIndex) => {
-          const n = [];
+          const n:number[] = [];
           arr.map((node, nodeIndex) => {
             if (arrayIndex == yNode && nodeIndex == xNode) {
               n.push(node > 2 ? 0 : (node + 1) % 2);
@@ -72,32 +119,34 @@ const useMatrix = () => {
 };
 
   const handleStartFlag = () => {
-    setStart(!start);
+    setStartFlag({state:!startFlag.state});
+    if(startFlag.state == false)setEndFlag({state:false})
   };
 
   const handleEndFlag = () => {
-    setEnd(!end);
+    setEndFlag({state:!endFlag.state});
+    if(endFlag.state == false)setStartFlag({state:false})
   };
 
   const StartButton = () => {
-    return <button onClick={handleStartFlag}>Start node</button>;
+    return <StateButton onClick={handleStartFlag} highlighted={startFlag.state} >Start 🎯</StateButton>;
   };
 
   const EndButton = () => {
-    return <button onClick={handleEndFlag}>End node</button>;
+    return <StateButton onClick={handleEndFlag} highlighted={endFlag.state} >End 🏁</StateButton>;
   };
 
-  const handleMouseOver = (event) => {
+
+  const handleMouseOver = (event:BaseSyntheticEvent) => {
     if(pressed){
       handleNodeHover(event);
     }
   }
 
-  const handleMouseDown = (event) =>{
+  const handleMouseDown = (event:BaseSyntheticEvent) =>{
       setPressed(true);
       setTriggered(true);
       handleNodeClick(event);
-      console.log(triggered);
   }
 
   const handleMouseUp = () => {
@@ -107,7 +156,6 @@ const useMatrix = () => {
   const handleMouseLeave = () => {
     setTriggered(false);
   }
-
 
   //const nodeStyleList = ['#FFFF', '#FFF2', '#02ff05', '#ff0202', '#0226ff'];
   const nodeImgList = [dirt, brick, grass, water, flag]

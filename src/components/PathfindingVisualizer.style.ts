@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 type Props = {
-  value: number;
+  highlighted:boolean | null;
 };
 
 export const MatrixWrapper = styled.div`
@@ -20,6 +20,8 @@ export const MatrixWrapper = styled.div`
     color: black;
     text-align: center;
     }
-  
-  }
 `;
+
+export const StateButton = styled.button<Props>`
+  background-color:${props => props.highlighted == true ? "#001858" : "#1a1a1a" };
+`
