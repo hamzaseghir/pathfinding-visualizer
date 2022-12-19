@@ -1,9 +1,17 @@
 import styled from 'styled-components';
+import water from '../img/water.png';
+import dirt from '../img/dirt.png'
+import brick from '../img/brickwall.jpg'
+import grass from '../img/grass.png';
+import flag from '../img/flag.webp'
 
-type Props = {
+type Flag = {
   highlighted?:boolean;
-  bg?:number;
 };
+
+type Node = {
+  state:number;
+}
 
 export const MatrixWrapper = styled.div`
   display: grid;
@@ -11,19 +19,11 @@ export const MatrixWrapper = styled.div`
   grid-template-rows: repeat(5, 2rem);
   grid-column-gap: 0px;
   grid-row-gap: 0px;
-
-  p {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border: 1px dashed;
-    border-color: white;
-    color: black;
-    text-align: center;
-    }
 `;
 
-export const Node = styled.p`
+const nodeImgList = [dirt, brick, grass, water, flag]
+
+export const Node = styled.p<Node>`
   display: inline-block;
   width: 100%;
   height: 100%;
@@ -31,8 +31,10 @@ export const Node = styled.p`
   border-color: white;
   color: black;
   text-align: center;
+  background-image: url(${node => nodeImgList[node.state]});
+  background-size:cover
 `
 
-export const StateButton = styled.button<Props>`
-  background-color:${props => props.highlighted == true ? "#001858" : "#1a1a1a" };
+export const StateButton = styled.button<Flag>`
+  background-color:${flag => flag.highlighted == true ? "#001858" : "#1a1a1a" };
 `

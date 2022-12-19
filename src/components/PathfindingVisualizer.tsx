@@ -1,11 +1,5 @@
 import { BaseSyntheticEvent, useEffect, useState } from 'react';
 import { MatrixWrapper , StateButton, Node} from './PathfindingVisualizer.style';
-import styled from 'styled-components';
-import water from '../img/water.png';
-import dirt from '../img/dirt.png'
-import brick from '../img/brickwall.jpg'
-import grass from '../img/grass.png';
-import flag from '../img/flag.webp'
 
 
 
@@ -21,7 +15,7 @@ const useMatrix = () => {
   const [triggered, setTriggered] = useState(false);
 
   type Node = {
-    value:number,
+    readonly value:number,
     state:number
   }
   
@@ -190,11 +184,12 @@ const useMatrix = () => {
     setTriggered(false);
   }
 
-  const nodeImgList = [dirt, brick, grass, water, flag]
+  //const nodeImgList = [dirt, brick, grass, water, flag]
 
   const matrixNode = (value: number, state:number, y:number ,x:number) => {
-    const nodeImg = nodeImgList[state];
-
+    //const nodeImg = nodeImgList[state];
+    // console.log(nodeImg);
+    console.log(state)
     return (
       <Node
         data-value={value}
@@ -204,7 +199,8 @@ const useMatrix = () => {
         onMouseUp={handleMouseUp}
         onClick={handleNodeClick}
         onMouseLeave={handleMouseLeave}
-        style={{ backgroundImage: `url(${nodeImg})`, backgroundSize:'cover'}}
+        state={state}
+        //style={{ backgroundImage: `url(${nodeImg})`, backgroundSize:'cover'}}
       >
       </Node>
     );
