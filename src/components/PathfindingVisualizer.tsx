@@ -1,5 +1,5 @@
 import { BaseSyntheticEvent, useEffect, useState } from 'react';
-import { MatrixWrapper , StateButton} from './PathfindingVisualizer.style';
+import { MatrixWrapper , StateButton, Node} from './PathfindingVisualizer.style';
 import styled from 'styled-components';
 import water from '../img/water.png';
 import dirt from '../img/dirt.png'
@@ -20,7 +20,7 @@ const useMatrix = () => {
 
   const generateMatrix = () => {
     // 28 x 75 ?
-    const arr = Array(10).fill(Array(20).fill(0));
+    const arr = Array(5).fill(Array(5).fill(0));
     return arr;
   };
 
@@ -37,7 +37,7 @@ const useMatrix = () => {
 
   useEffect(() => {
     if(endNode[0] != -1 && prevEndNode[0] != -1 
-      && JSON.stringify(prevEndNode) != JSON.stringify(endNode)
+      && JSON.stringify(prevEndNode) != JSON.stringify(startNode)
       && JSON.stringify(prevEndNode) != JSON.stringify(endNode) )cleanUpNode(prevEndNode[0],prevEndNode[1]);
   },[endNode])
 
@@ -161,47 +161,45 @@ const useMatrix = () => {
     setTriggered(false);
   }
 
-  //const nodeStyleList = ['#FFFF', '#FFF2', '#02ff05', '#ff0202', '#0226ff'];
   const nodeImgList = [dirt, brick, grass, water, flag]
 
-  const matrixNode = (value: number, x: number, y: number) => {
-    //const nodeStyle = nodeStyleList[value];
+  const matrixNode = (value: number, x: number, y: number, nodeValue:number) => {
     const nodeImg = nodeImgList[value];
 
     return (
-      <p
-        className="node"
-        data-y={y}
+      <Node
         data-x={x}
+        data-y={y}
+        data-value={nodeValue}
         key={y + ' ' + x}
         onMouseOver={handleMouseOver}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onClick={handleNodeClick}
         onMouseLeave={handleMouseLeave}
-        //style={{ backgroundColor: nodeStyle }}
         style={{ backgroundImage: `url(${nodeImg})`, backgroundSize:'cover'}}
       >
-      </p>
+      </Node>
     );
   };
 
   const Matrix = (array: number[][]) => {
     const arr = [];
+    let nodeValue = 0;
     for (let y = 0; y < Object.keys(array).length; y++) {
       for (let x = 0; x < array[y].length; x++) {
-        arr.push(matrixNode(array[y][x], x, y));
+        arr.push(matrixNode(array[y][x], x, y, nodeValue++));
       }
     }
 
     return <MatrixWrapper>{arr}</MatrixWrapper>;
   };
 
-  return { Matrix, generateMatrix, matrix, StartButton, EndButton };
+  return { Matrix, matrix, StartButton, EndButton };
 };
 
 const PathfindingVisualizer = () => {
-  const { Matrix, generateMatrix, matrix, StartButton, EndButton } =
+  const { Matrix, matrix, StartButton, EndButton } =
     useMatrix();
 
   return (
