@@ -7,20 +7,35 @@ import brick from '../img/brickwall.jpg'
 import grass from '../img/grass.png';
 import flag from '../img/flag.webp'
 
+
+
 const useMatrix = () => {
-  const [matrix, setMatrix] = useState<Array<Array<number>>>([[]]);
+  const [matrix, setMatrix] = useState<Array<Array<Node>>>([[]]);
   const [startFlag, setStartFlag] = useState({state:false});
-  const [startNode, setStartNode] = useState([-1,-1])
-  const [prevStartNode, setPrevStartNode] = useState([-1,-1]);
+  const [startNode, setStartNode] = useState(-1)
+  const [prevStartNode, setPrevStartNode] = useState(-1);
   const [endFlag, setEndFlag] = useState({state:false});
-  const [endNode, setEndNode] = useState([-1,-1]);
-  const [prevEndNode, setPrevEndNode] = useState([-1,-1]);
+  const [endNode, setEndNode] = useState(-1);
+  const [prevEndNode, setPrevEndNode] = useState(-1);
   const [pressed, setPressed] = useState(false);
   const [triggered, setTriggered] = useState(false);
 
+  type Node = {
+    value:number,
+    state:number
+  }
+  
   const generateMatrix = () => {
     // 28 x 75 ?
-    const arr = Array(5).fill(Array(5).fill(0));
+    const arr:Array<Array<Node>> = [];
+    let count = 0;
+    for(let i = 0 ; i < 5;i++){
+      let arri:Array<Node> = []
+      for(let j =0; j < 5; j++){
+        arri.push({value:count++, state:0})
+      }
+      arr.push(arri);
+    }
     return arr;
   };
 
@@ -30,34 +45,38 @@ const useMatrix = () => {
 
 
   useEffect(() => {
-    if(startNode[0] != -1 && prevStartNode[0] != -1 
-      && JSON.stringify(prevStartNode) != JSON.stringify(startNode) 
-      && JSON.stringify(prevStartNode) != JSON.stringify(endNode) )cleanUpNode(prevStartNode[0],prevStartNode[1]);
+    if(startNode != -1 && prevStartNode != -1 
+      && prevStartNode != startNode
+      && prevStartNode != endNode )cleanUpNode(prevStartNode,);
   },[startNode])
 
   useEffect(() => {
-    if(endNode[0] != -1 && prevEndNode[0] != -1 
-      && JSON.stringify(prevEndNode) != JSON.stringify(startNode)
-      && JSON.stringify(prevEndNode) != JSON.stringify(endNode) )cleanUpNode(prevEndNode[0],prevEndNode[1]);
+    if(endNode != -1 && prevEndNode != -1 
+      && prevEndNode != startNode
+      && prevEndNode != endNode )cleanUpNode(prevEndNode);
   },[endNode])
 
   const cleanUpMatrix = () => {
+    setStartNode(-1);
+    setPrevEndNode(-1);
+    setPrevEndNode(-1);
+    setEndNode(-1);
     setMatrix(matrix.map(arr => {
-      const n:number[] = [];
+      const n:Node[] = [];
       arr.map(node => {
-        n.push(0)
+        n.push({value:node.value,state:0})
       })
       return n;
     }))
   }
 
-  const cleanUpNode = (y:number,x:number) => {
+  const cleanUpNode = (value:number) => {
     setMatrix(
       matrix.map((arr, arrayIndex) => {
-        const n:number[] = [];
+        const n:Node[] = [];
         arr.map((node, nodeIndex) => {
-          if (arrayIndex == y && nodeIndex == x) {
-            n.push(0);
+          if (node.value == value) {
+            n.push({value:node.value, state:0});
         }else{
           n.push(node);
         }
@@ -66,25 +85,33 @@ const useMatrix = () => {
   }))
 }
 
-  const updateMatrix =(y:number,x:number) =>{
+  const updateMatrix =(value:number) =>{
     const prev = startNode;
     setMatrix(
       matrix.map((arr, arrayIndex) => {
-        const n:number[] = [];
+        const n:Node[] = [];
         arr.map((node, nodeIndex) => {
-          if (arrayIndex == y && nodeIndex == x) {
+          if (node.value == value) {
             if (startFlag.state) {
-              n.push(3);
-              setPrevStartNode([startNode[0],startNode[1]])
-              setStartNode([y,x]);
+              n.push({value:node.value,state:3});
+              if(endNode == value){
+                setPrevEndNode(-1);
+                setEndNode(-1);
+              }
+              setPrevStartNode(startNode)
+              setStartNode(value);
               handleStartFlag();
             } else if (endFlag.state) {
-              n.push(4);
-              setPrevEndNode([endNode[0],endNode[1]])
-              setEndNode([y,x]);
+              n.push({value:node.value,state:4});
+              if(startNode == value){
+                setStartNode(-1);
+                setPrevStartNode(-1);
+              }
+              setPrevEndNode(endNode)
+              setEndNode(value);
               handleEndFlag();
             } else {
-              n.push(node > 2 ? 0 : (node + 1) % 3);
+              n.push({value:node.value,state:node.state > 2 ? 0 : (node.state + 1) % 3});
             }
           } else {
             n.push(node);
@@ -96,22 +123,20 @@ const useMatrix = () => {
   }
 
   const handleNodeClick = (event:BaseSyntheticEvent) => {
-    const xNode = event.currentTarget.dataset.x;
-    const yNode = event.currentTarget.dataset.y;
-    updateMatrix(yNode,xNode);
+    const value = event.currentTarget.dataset.value;
+    updateMatrix(value);
   };
 
   const handleNodeHover = (event:BaseSyntheticEvent) => {
     if(!triggered){
       setTriggered(true);
-      const xNode = event.currentTarget.dataset.x;
-      const yNode = event.currentTarget.dataset.y;
+      const value = event.currentTarget.dataset.value;
       setMatrix(
         matrix.map((arr, arrayIndex) => {
-          const n:number[] = [];
+          const n:Node[] = [];
           arr.map((node, nodeIndex) => {
-            if (arrayIndex == yNode && nodeIndex == xNode) {
-              n.push(node > 2 ? 0 : (node + 1) % 2);
+            if (node.value == value) {
+              n.push({value:node.value,state:node.state > 2 ? 0 : (node.state + 1) % 2});
           }else {
             n.push(node);
           }
@@ -140,6 +165,10 @@ const useMatrix = () => {
     return <StateButton onClick={handleEndFlag} highlighted={endFlag.state} >End 🏁</StateButton>;
   };
 
+  const CleanUpButton = () => {
+    return <StateButton onClick={cleanUpMatrix} >Clean up !</StateButton>
+  }
+
 
   const handleMouseOver = (event:BaseSyntheticEvent) => {
     if(pressed){
@@ -163,14 +192,12 @@ const useMatrix = () => {
 
   const nodeImgList = [dirt, brick, grass, water, flag]
 
-  const matrixNode = (value: number, x: number, y: number, nodeValue:number) => {
-    const nodeImg = nodeImgList[value];
+  const matrixNode = (value: number, state:number, y:number ,x:number) => {
+    const nodeImg = nodeImgList[state];
 
     return (
       <Node
-        data-x={x}
-        data-y={y}
-        data-value={nodeValue}
+        data-value={value}
         key={y + ' ' + x}
         onMouseOver={handleMouseOver}
         onMouseDown={handleMouseDown}
@@ -183,23 +210,22 @@ const useMatrix = () => {
     );
   };
 
-  const Matrix = (array: number[][]) => {
+  const Matrix = (array: Node[][]) => {
     const arr = [];
-    let nodeValue = 0;
     for (let y = 0; y < Object.keys(array).length; y++) {
       for (let x = 0; x < array[y].length; x++) {
-        arr.push(matrixNode(array[y][x], x, y, nodeValue++));
+        arr.push(matrixNode(array[y][x].value, array[y][x].state, y,x));
       }
     }
 
     return <MatrixWrapper>{arr}</MatrixWrapper>;
   };
 
-  return { Matrix, matrix, StartButton, EndButton };
+  return { Matrix, matrix, StartButton, EndButton , CleanUpButton};
 };
 
 const PathfindingVisualizer = () => {
-  const { Matrix, matrix, StartButton, EndButton } =
+  const { Matrix, matrix, StartButton, EndButton, CleanUpButton } =
     useMatrix();
 
   return (
@@ -207,6 +233,7 @@ const PathfindingVisualizer = () => {
       <h1>Pathfindig Visualizer 🚀</h1>
       <StartButton />
       <EndButton />
+      <CleanUpButton  />
       <Matrix {...matrix} />
     </>
   );
