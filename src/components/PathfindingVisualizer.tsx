@@ -1,6 +1,8 @@
 import { BaseSyntheticEvent, useEffect, useState } from 'react';
 import { MatrixWrapper , StateButton, Node} from './PathfindingVisualizer.style';
 
+const MATRIX_ROWS = 4;
+const MATRIX_COLUMNS = 5;
 
 
 const useMatrix = () => {
@@ -23,15 +25,35 @@ const useMatrix = () => {
     // 28 x 75 ?
     const arr:Array<Array<Node>> = [];
     let count = 0;
-    for(let i = 0 ; i < 5;i++){
+    for(let i = 0 ; i < MATRIX_ROWS;i++){
       let arri:Array<Node> = []
-      for(let j =0; j < 5; j++){
+      for(let j =0; j < MATRIX_COLUMNS; j++){
         arri.push({value:count++, state:0})
       }
       arr.push(arri);
     }
     return arr;
   };
+
+  // 0: road, 1:wall, 2:grass, 3:start,4:end
+  const _convertToAdjacencyList = (matrix:Node[][]) => {
+    const map = new Map();
+    matrix.map((array, y) => {
+      array.map((node, x) => {
+        if(node.value != 1){
+          if((y-1) >=  0 && matrix[y-1][x].state != 1)
+          map.has(node.value) ? map.set(node.value, [...map.get(node.value),matrix[y-1][x].value]) : map.set(node.value , [matrix[y-1][x].value]);
+          if((y+1) < matrix.length && matrix[y+1][x].state != 1)
+          map.has(node.value) ? map.set(node.value, [...map.get(node.value),matrix[y+1][x].value]) : map.set(node.value , [matrix[y+1][x].value]);
+          if((x-1) >= 0 && matrix[y][x-1].state != 1)
+          map.has(node.value) ? map.set(node.value, [...map.get(node.value),matrix[y][x-1].value]) : map.set(node.value , [matrix[y][x-1].value]);
+          if((x+1) < array.length && matrix[y][x+1].state != 1)
+          map.has(node.value) ? map.set(node.value, [...map.get(node.value),matrix[y][x+1].value]) : map.set(node.value , [matrix[y][x+1].value]);
+        }
+      })
+    })
+    console.log(map.get(7));
+  }
 
   useEffect(() => {
     setMatrix(generateMatrix());
@@ -151,6 +173,14 @@ const useMatrix = () => {
     if(endFlag.state == false)setStartFlag({state:false})
   };
 
+  const handleAdjacency = () => {
+    _convertToAdjacencyList(matrix)
+  }
+
+  const AdjancencyListButton = () => {
+    return <StateButton onClick={handleAdjacency}>Dump adjacency list</StateButton>
+  }
+
   const StartButton = () => {
     return <StateButton onClick={handleStartFlag} highlighted={startFlag.state} >Start 🎯</StateButton>;
   };
@@ -184,12 +214,8 @@ const useMatrix = () => {
     setTriggered(false);
   }
 
-  //const nodeImgList = [dirt, brick, grass, water, flag]
-
   const matrixNode = (value: number, state:number, y:number ,x:number) => {
-    //const nodeImg = nodeImgList[state];
-    // console.log(nodeImg);
-    console.log(state)
+
     return (
       <Node
         data-value={value}
@@ -200,8 +226,7 @@ const useMatrix = () => {
         onClick={handleNodeClick}
         onMouseLeave={handleMouseLeave}
         state={state}
-        //style={{ backgroundImage: `url(${nodeImg})`, backgroundSize:'cover'}}
-      >
+     >
       </Node>
     );
   };
@@ -214,14 +239,14 @@ const useMatrix = () => {
       }
     }
 
-    return <MatrixWrapper>{arr}</MatrixWrapper>;
+    return <MatrixWrapper rows={MATRIX_ROWS} columns={MATRIX_COLUMNS}>{arr}</MatrixWrapper>;
   };
 
-  return { Matrix, matrix, StartButton, EndButton , CleanUpButton};
+  return { Matrix, matrix, StartButton, EndButton , CleanUpButton, AdjancencyListButton};
 };
 
 const PathfindingVisualizer = () => {
-  const { Matrix, matrix, StartButton, EndButton, CleanUpButton } =
+  const { Matrix, matrix, StartButton, EndButton, CleanUpButton, AdjancencyListButton } =
     useMatrix();
 
   return (
@@ -230,6 +255,7 @@ const PathfindingVisualizer = () => {
       <StartButton />
       <EndButton />
       <CleanUpButton  />
+      <AdjancencyListButton />
       <Matrix {...matrix} />
     </>
   );

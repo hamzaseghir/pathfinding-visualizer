@@ -13,10 +13,15 @@ type Node = {
   state:number;
 }
 
-export const MatrixWrapper = styled.div`
+type Matrix = {
+  rows:number;
+  columns:number;
+}
+
+export const MatrixWrapper = styled.div<Matrix>`
   display: grid;
-  grid-template-columns: repeat(5, 2rem);
-  grid-template-rows: repeat(5, 2rem);
+  grid-template-rows: repeat(${matrix => matrix.rows}, 2rem);
+  grid-template-columns: repeat(${matrix => matrix.columns}, 2rem);
   grid-column-gap: 0px;
   grid-row-gap: 0px;
 `;
