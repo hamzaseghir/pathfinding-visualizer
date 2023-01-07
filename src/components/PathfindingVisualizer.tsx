@@ -40,7 +40,7 @@ const useMatrix = () => {
     const map = new Map();
     matrix.map((array, y) => {
       array.map((node, x) => {
-        if(node.value != 1){
+        if(node.state != 1){
           if((y-1) >=  0 && matrix[y-1][x].state != 1)
           map.has(node.value) ? map.set(node.value, [...map.get(node.value),matrix[y-1][x].value]) : map.set(node.value , [matrix[y-1][x].value]);
           if((y+1) < matrix.length && matrix[y+1][x].state != 1)
@@ -52,7 +52,7 @@ const useMatrix = () => {
         }
       })
     })
-    console.log(map.get(7));
+    console.log(map);
   }
 
   useEffect(() => {
