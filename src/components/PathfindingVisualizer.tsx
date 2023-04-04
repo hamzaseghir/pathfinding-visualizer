@@ -2,18 +2,18 @@ import { BaseSyntheticEvent, useEffect, useState } from 'react';
 import { MatrixWrapper , StateButton, Node} from './PathfindingVisualizer.style';
 import BreadthFirstSearch from './algorithms/Bfs'; 
 
-const MATRIX_ROWS = 4;
-const MATRIX_COLUMNS = 4;
+const MATRIX_ROWS = 3;
+const MATRIX_COLUMNS = 3;
 
 
 const useMatrix = () => {
   const [matrix, setMatrix] = useState<Array<Array<Node>>>([[]]);
   const [startFlag, setStartFlag] = useState({state:false});
-  const [startNode, setStartNode] = useState(-1)
-  const [prevStartNode, setPrevStartNode] = useState(-1);
+  const [startNode, setStartNode] = useState<number>(-1)
+  const [prevStartNode, setPrevStartNode] = useState<number>(-1);
   const [endFlag, setEndFlag] = useState({state:false});
-  const [endNode, setEndNode] = useState(-1);
-  const [prevEndNode, setPrevEndNode] = useState(-1);
+  const [endNode, setEndNode] = useState<number>(-1);
+  const [prevEndNode, setPrevEndNode] = useState<number>(-1);
   const [pressed, setPressed] = useState(false);
   const [triggered, setTriggered] = useState(false);
 
@@ -53,12 +53,8 @@ const useMatrix = () => {
         }
       })
     })
-    console.log(map);
+    // console.log(map);
     return map;
-  }
-
-  const bfs = () => {
-    BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode,endNode);
   }
 
   useEffect(() => {
@@ -170,7 +166,9 @@ const useMatrix = () => {
 };
 
   const handleBfs = () => {
-    if(startNode != -1 && endNode != -1) BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode, endNode)
+    if(startNode != -1 && endNode != -1) {
+      let res = BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode, endNode)
+    }
   }
 
   const handleStartFlag = () => {

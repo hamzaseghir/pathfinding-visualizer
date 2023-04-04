@@ -3,12 +3,13 @@ let queue:number[] = [];
 
 const BreadthFirstSearch = (matrix:Map<number, number[]>, startNode:number, endNode:number) => {
 
-  for(let node of matrix.get(startNode)!)visited.push(node)
-  for(let node of matrix.get(startNode)!)queue.push(node)
+  visited.push(Number(startNode));
+  queue.push(Number(startNode))
 
   while(queue.length > 0){
     let s = queue.pop()!;
-    console.log(s);
+    console.log("s:", matrix.get(s));
+    console.log("visited:", visited);
 
     for(let node of matrix.get(s)!){
       if(!visited.includes(node)){
