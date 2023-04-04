@@ -1,8 +1,9 @@
 import { BaseSyntheticEvent, useEffect, useState } from 'react';
 import { MatrixWrapper , StateButton, Node} from './PathfindingVisualizer.style';
+import BreadthFirstSearch from './algorithms/Bfs'; 
 
 const MATRIX_ROWS = 4;
-const MATRIX_COLUMNS = 5;
+const MATRIX_COLUMNS = 4;
 
 
 const useMatrix = () => {
@@ -53,6 +54,11 @@ const useMatrix = () => {
       })
     })
     console.log(map);
+    return map;
+  }
+
+  const bfs = () => {
+    BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode,endNode);
   }
 
   useEffect(() => {
@@ -163,6 +169,10 @@ const useMatrix = () => {
     return null;
 };
 
+  const handleBfs = () => {
+    if(startNode != -1 && endNode != -1) BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode, endNode)
+  }
+
   const handleStartFlag = () => {
     setStartFlag({state:!startFlag.state});
     if(startFlag.state == false)setEndFlag({state:false})
@@ -175,6 +185,10 @@ const useMatrix = () => {
 
   const handleAdjacency = () => {
     _convertToAdjacencyList(matrix)
+  }
+
+  const AlgBfsButton = () => {
+    return <StateButton onClick={handleBfs}> Bfs</StateButton>
   }
 
   const AdjancencyListButton = () => {
@@ -242,11 +256,11 @@ const useMatrix = () => {
     return <MatrixWrapper rows={MATRIX_ROWS} columns={MATRIX_COLUMNS}>{arr}</MatrixWrapper>;
   };
 
-  return { Matrix, matrix, StartButton, EndButton , CleanUpButton, AdjancencyListButton};
+  return { Matrix, matrix, StartButton, EndButton , CleanUpButton, AdjancencyListButton, AlgBfsButton};
 };
 
 const PathfindingVisualizer = () => {
-  const { Matrix, matrix, StartButton, EndButton, CleanUpButton, AdjancencyListButton } =
+  const { Matrix, matrix, StartButton, EndButton, CleanUpButton, AdjancencyListButton , AlgBfsButton} =
     useMatrix();
 
   return (
@@ -256,6 +270,7 @@ const PathfindingVisualizer = () => {
       <EndButton />
       <CleanUpButton  />
       <AdjancencyListButton />
+      <AlgBfsButton/>
       <Matrix {...matrix} />
     </>
   );
