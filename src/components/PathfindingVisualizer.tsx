@@ -57,6 +57,13 @@ const useMatrix = () => {
     return map;
   }
 
+  const _animationAlgorithm = (nodes:Array<number>) => {
+    for(let node in nodes){
+      // red : filter: invert(32%) sepia(89%) saturate(4344%) hue-rotate(359deg) brightness(100%) contrast(108%);
+      // blue : filter: invert(46%) sepia(99%) saturate(2216%) hue-rotate(162deg) brightness(96%) contrast(102%);
+    }
+  };
+
   useEffect(() => {
     setMatrix(generateMatrix());
   }, []);
@@ -111,25 +118,25 @@ const useMatrix = () => {
         arr.map((node, nodeIndex) => {
           if (node.value == value) {
             if (startFlag.state) {
-              n.push({value:node.value,state:3});
+              n.push({value:Number(node.value),state:3});
               if(endNode == value){
                 setPrevEndNode(-1);
                 setEndNode(-1);
               }
-              setPrevStartNode(startNode)
-              setStartNode(value);
+              setPrevStartNode(Number(startNode))
+              setStartNode(Number(value));
               handleStartFlag();
             } else if (endFlag.state) {
-              n.push({value:node.value,state:4});
+              n.push({value:Number(node.value),state:4});
               if(startNode == value){
                 setStartNode(-1);
                 setPrevStartNode(-1);
               }
-              setPrevEndNode(endNode)
-              setEndNode(value);
+              setPrevEndNode(Number(endNode))
+              setEndNode(Number(value));
               handleEndFlag();
             } else {
-              n.push({value:node.value,state:node.state > 2 ? 0 : (node.state + 1) % 3});
+              n.push({value:Number(node.value),state:node.state > 2 ? 0 : (node.state + 1) % 3});
             }
           } else {
             n.push(node);
@@ -168,6 +175,7 @@ const useMatrix = () => {
   const handleBfs = () => {
     if(startNode != -1 && endNode != -1) {
       let res = BreadthFirstSearch(_convertToAdjacencyList(matrix), startNode, endNode)
+      console.log(res);
     }
   }
 
