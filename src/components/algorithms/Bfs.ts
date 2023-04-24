@@ -1,15 +1,16 @@
-let visited:Array<number> = [];
-let queue:number[] = [];
-
 const BreadthFirstSearch = (matrix:Map<number, number[]>, startNode:number, endNode:number) => {
-  console.log("Start node : ", startNode, 'type of :' , typeof(startNode));
+  let visited:Array<number> = [];
+  let queue:number[] = [];
+  queue.push(startNode);
   visited.push(startNode);
-  queue.push(startNode)
 
   while(queue.length > 0){
     let s = queue.pop()!;
-    if(visited[visited.length-1] == endNode)break;
-
+    console.log( "visited = ", visited[visited.length-1]);
+    if(visited[visited.length-1] == endNode){
+      console.log("break")
+      break;
+    }
     for(let node of matrix.get(s)!){
       if(!visited.includes(node)){
         visited.push(node);
